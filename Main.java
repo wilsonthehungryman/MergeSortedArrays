@@ -1,9 +1,12 @@
+import java.util.function.IntFunction;
+import java.util.function.BiPredicate;
+
 public class Main
 {
     public static void main(String[] args){
         int[][] arrays = {{0,3,4,5},{1,3,5,7,10},{7,8}};
         
-        int[] result = ArrayMerger.merge(arrays);
+        int[] result = ArrayMerger.merge(arrays, false);
         printArray(result);
     }
     
@@ -14,30 +17,40 @@ public class Main
     }
     
     static class ArrayMerger{
-        public static int[] merge(int[][] arrays){
+        public static int[] merge(int[][] arrays, boolean outputLowToHigh){
+            if(arrays[0][0] < arrays[0][arrays[0].length -1])
+                return merge(arrays, outputLowToHigh, true);
+            return merge(arrays, outputLowToHigh, false);
+        }
+        
+        public static int[] merge(int[][] arrays, boolean outputLowToHigh, boolean inputsLowToHigh){
             int[] currentValues = new int[arrays.length];
             int[] pointers = new int[arrays.length];
             int[] result = initialize(arrays, pointers, currentValues);
             int length = currentValues.length;
             
+            // Not sure if the saved equality checks are worth the cost of lambdas...
+            BiPredicate<Integer, Integer> comparer = getInnerLoopComparer(inputsLowToHigh);
+            IntFunction<Integer> resultIndex = getResultIndexFunction(inputsLowToHigh && outputLowToHigh, result.length);;
+
             for(int i = 0; i < result.length; i++){
-                int min = currentValues[0];
-                int minPointer = 0;
+                int current = currentValues[0];
+                int currentPointer = 0;
                 for(int j = 1; j < length; j++){
-                    if(currentValues[j] < min){
-                        min = currentValues[j];
-                        minPointer = j;
+                    if(comparer.test(currentValues[j], current)){ //< current && inputsLowToHigh){
+                        current = currentValues[j];
+                        currentPointer = j;
                     }
                 }
                 
-                result[i] = min;
-                pointers[minPointer] += 1;
+                result[resultIndex.apply(i)] = current;
+                pointers[currentPointer] += 1;
                 
-                if(pointers[minPointer] == arrays[minPointer].length){
-                    shrink(minPointer, arrays, pointers, currentValues);
+                if(pointers[currentPointer] == arrays[currentPointer].length){
+                    shrink(currentPointer, arrays, pointers, currentValues);
                     length--;
                 }else
-                    currentValues[minPointer] = arrays[minPointer][pointers[minPointer]];
+                    currentValues[currentPointer] = arrays[currentPointer][pointers[currentPointer]];
             }
             return result;
         }
@@ -58,6 +71,19 @@ public class Main
                 values[i -1] = values[i];
                 arrays[i -1] = arrays[i];
             }
+        }
+        
+        private static BiPredicate<Integer,Integer> getInnerLoopComparer(boolean inputsLowToHigh){
+            if(inputsLowToHigh)
+                return (current, other) -> current < other;
+            else
+                return (current, other) -> current > other;
+        }
+        
+        private static IntFunction getResultIndexFunction(boolean sameOrder, int resultLength){
+            if(sameOrder)
+                return i -> i;
+            return i -> { return resultLength - 1 - i; };
         }
     }   
 }

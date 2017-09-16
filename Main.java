@@ -18,11 +18,12 @@ public class Main
             int[] currentValues = new int[arrays.length];
             int[] pointers = new int[arrays.length];
             int[] result = initialize(arrays, pointers, currentValues);
+            int length = currentValues.length;
             
             for(int i = 0; i < result.length; i++){
                 int min = currentValues[0];
                 int minPointer = 0;
-                for(int j = 1; j < currentValues.length; j++){
+                for(int j = 1; j < length; j++){
                     if(currentValues[j] < min){
                         min = currentValues[j];
                         minPointer = j;
@@ -33,11 +34,8 @@ public class Main
                 pointers[minPointer] += 1;
                 
                 if(pointers[minPointer] == arrays[minPointer].length){
-                    int[] newPointers = new int[pointers.length -1];
-                    int[] newCurrentValues = new int[pointers.length -1];
-                    shrink(minPointer, arrays, pointers, newPointers, currentValues, newCurrentValues);
-                    currentValues = newCurrentValues;
-                    pointers = newPointers;
+                    shrink(minPointer, arrays, pointers, currentValues);
+                    length--;
                 }else
                     currentValues[minPointer] = arrays[minPointer][pointers[minPointer]];
             }
@@ -54,15 +52,10 @@ public class Main
             return new int[totalLength];
         }
         
-        private static void shrink(int pointer, int[][] arrays, int[] pointers, int[] newPointers, int[] values, int[] newValues){
-            for(int i = 0; i < pointer; i++){
-                newPointers[i] = pointers[i];
-                newValues[i] = values[i];
-            }
-            
+        private static void shrink(int pointer, int[][] arrays, int[] pointers, int[] values){
             for(int i = pointer + 1; i < pointers.length; i++){
-                newPointers[i -1] = pointers[i];
-                newValues[i -1] = values[i];
+                pointers[i -1] = pointers[i];
+                values[i -1] = values[i];
                 arrays[i -1] = arrays[i];
             }
         }

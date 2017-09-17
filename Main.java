@@ -21,7 +21,7 @@ public class Main
         result = ArrayMerger.merge(copyAndReverse.get(), true);
         ArrayUtil.printArray(result);
         
-        result = ArrayMerger.merge(new int[][]{{5,4,3,2,1}}, false);
+        result = ArrayMerger.merge(new int[][]{{5,4,3,2,1}}, true);
         ArrayUtil.printArray(result);
     }
     
@@ -30,6 +30,7 @@ public class Main
             if(arrays == null)
                 return null;
             
+            // prone to failure/exceptions
             if(arrays[0][0] < arrays[0][arrays[0].length -1])
                 return merge(arrays, outputLowToHigh, true);
             
@@ -47,7 +48,7 @@ public class Main
             
             // Not sure if the saved equality checks are worth the cost of lambdas...
             BiPredicate<Integer, Integer> comparer = getInnerLoopComparer(inputsLowToHigh);
-            IntFunction<Integer> resultIndex = getResultIndexFunction(inputsLowToHigh && outputLowToHigh, result.length);;
+            IntFunction<Integer> resultIndex = getResultIndexFunction(inputsLowToHigh == outputLowToHigh, result.length);
 
             for(int i = 0; i < result.length; i++){
                 int current = currentValues[0];
@@ -90,7 +91,7 @@ public class Main
         }
         
         private static int[] singleArrayCase(int[][] arrays, boolean lowToHigh, boolean inputLowToHigh){
-            if(lowToHigh && inputLowToHigh)
+            if(lowToHigh == inputLowToHigh)
                 return arrays[0];
             
             for(int i = 0; i < arrays[0].length / 2; i++){

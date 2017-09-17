@@ -141,17 +141,17 @@ class ArrayMerger{
     
     private static int[] initialize(int[][] arrays, int[] pointers, int[] currentValues,
                                     IntFunction<Integer>[] indexMap){
-                                    // BiFunction<Integer, int[], Integer>[] indexMap){
         int totalLength = 0;
         
         // TODO will fail if subarray is null
         for(int i = 0; i < arrays.length; i++){
-            totalLength += arrays[i].length;
-            currentValues[i] = arrays[i][0];
-            if(arrays[i][arrays[i].length -1] < currentValues[i])
+            if(arrays[i][arrays[i].length -1] < arrays[i][0])
                 indexMap[i] = getIndexFunction(false, arrays[i].length); 
             else
                 indexMap[i] = getIndexFunction(true, arrays[i].length);
+                
+            totalLength += arrays[i].length;
+            currentValues[i] = arrays[i][indexMap[i].apply(0)];
         }
         return new int[totalLength];
     }

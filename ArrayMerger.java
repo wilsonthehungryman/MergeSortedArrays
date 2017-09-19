@@ -57,18 +57,17 @@ class ArrayMerger{
 
         // loop through the results array, appending one value each time
         for(int i = 0; i < result.length; i++){
-            int current = currentValues[0];
+            result[resultIndex.apply(i)] = currentValues[0];
             int currentPointer = 0;
             
             for(int j = 1; j < length; j++){
                 // comparer will ensure the proper comparison is used 
-                if(comparer.test(currentValues[j], current)){
-                    current = currentValues[j];
+                if(comparer.test(currentValues[j], result[resultIndex.apply(i)])){
+                    result[resultIndex.apply(i)] = currentValues[j];
                     currentPointer = j;
                 }
             }
             
-            result[resultIndex.apply(i)] = current;
             pointers[currentPointer] += 1;
             
             // if the current pointer is at the end of the array, remove that subarray
@@ -104,17 +103,16 @@ class ArrayMerger{
 
         // loop through the results array, appending one value each time
         for(int i = 0; i < result.length; i++){
-            int current = currentValues[0];
+            result[resultIndex.apply(i)] = currentValues[0];
             int currentPointer = 0;
             
             for(int j = 1; j < length; j++){
-                if(currentValues[j] < current){
-                    current = currentValues[j];
+                if(currentValues[j] < result[resultIndex.apply(i)]){
+                    result[resultIndex.apply(i)] = currentValues[j];
                     currentPointer = j;
                 }
             }
             
-            result[resultIndex.apply(i)] = current;
             pointers[currentPointer] += 1;
             
             // if the current pointer is at the end of the array, remove that subarray
